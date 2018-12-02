@@ -1,0 +1,3 @@
+# Advent of Code 2018
+
+I'll try Rust lol....
