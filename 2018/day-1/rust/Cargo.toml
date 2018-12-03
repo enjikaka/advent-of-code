@@ -1,0 +1,10 @@
+[package]
+name = "day-1"
+version = "0.1.0"
+authors = ["Jeremy Karlsson <jeremy.karlsson@tidal.com>"]
+
+[dependencies]
+
+[[bin]]
+name = "day-1"
+path = "main.rs"
