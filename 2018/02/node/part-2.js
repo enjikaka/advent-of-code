@@ -18,52 +18,41 @@ const mockData = [
 'wvxyzas'
 ];
 
-const res = nonEmptyLines
-  .map((currentLine, i, arr) => {
-    const currentLineArr = currentLine.split('');
+function hammingDistance(a, b) {
+  if (a.length !== b.length) {
+    throw new Error('Strings must be of the same length');
+  }
 
-    const diffs = arr
-      .reduce((acc, compareLine) => {
-        if (currentLine !== compareLine) {
-          const compareLineArr = compareLine.split('');
+  let distance = 0;
 
-          const indexDiffs = currentLineArr
-            .filter(value => !compareLineArr.includes(value))
-            .map(c => currentLineArr.indexOf(c));
-
-          if (indexDiffs.length === 1) {
-            acc[compareLine] = indexDiffs;
-          }
-        }
-
-        return acc;
-      }, {});
-
-    return { text: currentLine, diffs };
-  })
-  .map(obj => {
-    function diff (a, b) {
-      return a.split('').filter(value => -1 === b.split('').indexOf(value))[0];
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i]) {
+      distance += 1;
     }
+  }
 
-    const keysToKeep = Object.keys(obj.diffs).filter(key => {
-      const diffOne = diff(key, obj.text);
-      const diffTwo = diff(obj.text, key);
+  return distance;
+}
 
-      const diffOneIndex = key.indexOf(diffOne);
-      const diffTwoIndex = obj.text.indexOf(diffTwo);
+const res = nonEmptyLines
+  .filter(line =>
+    line
+      .split('')
+      .filter((currentValue, _, sourceArray) => {
+        const instancesOfSameLetter = sourceArray.filter(x => x === currentValue).length;
 
-      return diffOneIndex === diffTwoIndex;
-    });
+        return instancesOfSameLetter === 2 || instancesOfSameLetter === 3;
+      })
+  )
+  .sort()
+  .map((currentLine, i, arr) => ({
+    line: currentLine,
+    distanceToOtherLines: arr
+      .filter(x => x !== currentLine)
+      .map(otherLine => hammingDistance(currentLine, otherLine))
+  }))
+  .filter(({ distanceToOtherLines }) => distanceToOtherLines.includes(1));
 
-    const keysToRemove = Object.keys(obj.diffs).filter(value => -1 === keysToKeep.indexOf(value));
+const id = res[0].line.split('').filter(value => -1 !== res[1].line.split('').indexOf(value)).join('');
 
-    keysToRemove.forEach(key => {
-      delete obj.diffs[key];
-    });
-
-    return obj;
-  })
-  .filter(item => Object.keys(item.diffs).length !== 0);
-
-console.log(res);
+console.log(id);
