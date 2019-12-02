@@ -1,0 +1,42 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+</head>
+<body>
+  <label>
+    Open input file containing the mass of each module:
+    <input type="file">
+  </label>
+  Fuel needed: <output></output>
+  <script type="module">
+  import fuelRequired from './fuel-calc.js';
+
+  const input = document.querySelector('input');
+  const output = document.querySelector('output');
+
+  input.addEventListener('input', e => {
+    handleFile(e.target.files[0]);
+  });
+
+  function readFileAsText (file) {
+    return new Promise(resolve => {
+      const fileReader = new FileReader();
+
+    fileReader.onloadend = () => resolve(fileReader.result);
+
+    fileReader.readAsText(file);
+    });
+  }
+
+  async function handleFile (file) {
+    const text = await readFileAsText(file);
+    const notNan = n => !Number.isNaN(n);
+    const fuelNeeded = text.split('\n').map(s => parseInt(s, 10)).filter(notNan).map(fuelRequired).reduce((sum, x) => sum + x);
+
+    output.textContent = fuelNeeded;
+  }
+  </script>
+</body>
+</html>
