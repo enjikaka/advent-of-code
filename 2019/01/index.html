@@ -8,34 +8,65 @@
   <label>
     Open input file containing the mass of each module:
     <input type="file">
-  </label>
-  Fuel needed: <output></output>
+  </label><br>
+  Part one: <output id="part-one"></output><br>
+  Part two: <output id="part-two"></output><br>
   <script type="module">
   import fuelRequired from './fuel-calc.js';
 
   const input = document.querySelector('input');
-  const output = document.querySelector('output');
+  const outputOne = document.querySelector('#part-one');
+  const outputTwo = document.querySelector('#part-two');
 
-  input.addEventListener('input', e => {
-    handleFile(e.target.files[0]);
-  });
+  input.addEventListener('input', e => handleFile(e.target.files[0]));
 
   function readFileAsText (file) {
     return new Promise(resolve => {
       const fileReader = new FileReader();
 
-    fileReader.onloadend = () => resolve(fileReader.result);
+      fileReader.onloadend = () => resolve(fileReader.result);
 
-    fileReader.readAsText(file);
+      fileReader.readAsText(file);
     });
+  }
+
+  function fuelRequiredForFuel (fuel) {
+    let total = fuel;
+
+    while (fuel > 0) {
+      let f = fuelRequired(fuel) > 0 ? fuelRequired(fuel) : 0;
+
+      total += f;
+      fuel = f;
+    }
+
+    return total;
+  }
+
+  function partOne (numbers) {
+    const fuelNeeded = numbers
+      .map(fuelRequired)
+      .reduce((sum, x) => sum + x);
+
+    outputOne.textContent = fuelNeeded;
+  }
+
+  function partTwo (numbers) {
+    const fuelNeeded = numbers
+      .map(fuelRequired)
+      .map(fuelRequiredForFuel)
+      .reduce((sum, x) => sum + x);
+
+    outputTwo.textContent = fuelNeeded;
   }
 
   async function handleFile (file) {
     const text = await readFileAsText(file);
     const notNan = n => !Number.isNaN(n);
-    const fuelNeeded = text.split('\n').map(s => parseInt(s, 10)).filter(notNan).map(fuelRequired).reduce((sum, x) => sum + x);
+    const numbers = text.split('\n').map(s => parseInt(s, 10)).filter(notNan);
 
-    output.textContent = fuelNeeded;
+    partOne(numbers);
+    partTwo(numbers);
   }
   </script>
 </body>
